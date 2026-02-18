@@ -11,7 +11,9 @@ import {
 import { useState } from 'react'
 import { Dropdown } from 'antd'
 import { Modal } from 'antd'
-import useApiFetch from '@/hooks/useApiFetch'
+import { useUrls } from '@/services/urlService'
+import { useDeleteUser } from '@/services/userService'
+import { useChangeUsername } from '@/services/userService'
 
 const items = [
   {
@@ -26,13 +28,14 @@ const items = [
 
 const Settings = () => {
   const user = useAppStore((s) => s.user)
-  const logout = useAppStore((s) => s.logout)
-  const setUser = useAppStore((s) => s.setUser)
   const theme = useAppStore((s) => s.theme)
-  const urls = useAppStore((s) => s.urls)
+  const { data: urls } = useUrls()
   const [username, setUsername] = useState(user?.username)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const { fetchData } = useApiFetch()
+
+  const { mutate: changeUsername, isPending: isPendingChangeUsername } =
+    useChangeUsername()
+  const { mutateAsync: deleteUser } = useDeleteUser()
 
   const exportToJSON = () => {
     const blob = new Blob([JSON.stringify(urls)], {
@@ -49,7 +52,6 @@ const Settings = () => {
   const exportToCSV = () => {
     if (!urls || !urls.length) return
 
-    // Cabeceras del CSV
     const headers = [
       'originalUrl',
       'shortCode',
@@ -59,21 +61,17 @@ const Settings = () => {
       'user'
     ]
 
-    // Filas
     const rows = urls.map((item) =>
       headers
         .map((header) => {
           const value = item[header] ?? ''
-          // Escapar comillas
           return `"${String(value).replace(/"/g, '""')}"`
         })
         .join(';')
     )
 
-    // CSV final
     const csvContent = [headers.join(';'), ...rows].join('\n')
 
-    // Crear y descargar archivo
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
 
@@ -86,37 +84,22 @@ const Settings = () => {
   }
 
   const handleExportLinks = ({ key }) => {
-    if (key === 'json') {
-      exportToJSON()
-    } else if (key === 'csv') {
-      exportToCSV()
-    }
+    key === 'json' ? exportToJSON() : exportToCSV()
   }
 
   const handleChangeUsername = async () => {
-    const { user: userData } = await fetchData({
-      url: '/auth/changeUsername',
-      options: {
-        method: 'PUT',
-        body: { username, id: user.id }
-      }
-    })
-    setUser(userData)
+    changeUsername({ username, id: user.id })
   }
 
   const handleDeleteUser = async () => {
-    await fetchData({
-      url: '/auth/deleteUser',
-      options: { method: 'DELETE', body: { id: user.id } }
-    })
-    logout(null)
+    await deleteUser({ id: user.id })
     setOpenDeleteModal(false)
   }
 
   return (
     <div className="max-sm:pl-2 max-sm:pr-2 sm:pl-42 sm:pr-42">
       <div
-        className={`border-2 border-gray-300 rounded-2xl p-4 ${
+        className={`animate-fadeUp border-2 border-gray-300 rounded-2xl p-4 ${
           theme === 'dark' ? 'bg-[#1F1F1F]' : 'bg-gray-50'
         }`}
       >
@@ -134,6 +117,7 @@ const Settings = () => {
                 disabled={user?.username === username}
                 onClick={handleChangeUsername}
                 className="ml-2"
+                loading={isPendingChangeUsername}
               >
                 Guardar
               </Button>

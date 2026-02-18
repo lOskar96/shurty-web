@@ -10,8 +10,15 @@ import { useState } from 'react'
 import QRCodeModal from './QRCodeModal'
 import { message } from 'antd'
 import DeleteModal from './DeleteModal'
-import EditModal from './EditModal'
-import Text from '../Text'
+import URLModalForm from '../URLModalForm'
+import { useEditUrl } from '@/services/urlService'
+import { useCallback } from 'react'
+import { useMemo } from 'react'
+import { Tooltip } from 'antd'
+import ClicksBadge from './ClicksBadge'
+import URLCardDescription from './URLCardDescription'
+
+const URL_API = import.meta.env.VITE_API_URL
 
 const URLCard = ({
   originalUrl,
@@ -20,41 +27,53 @@ const URLCard = ({
   loading,
   icon,
   id,
-  refreshURLs,
   clicks,
   createdAt
 }) => {
-  const URL_API = import.meta.env.VITE_API_URL
+  const [messageApi, contextHolder] = message.useMessage()
+  const date = new Date(createdAt).toLocaleDateString()
+  const { mutateAsync, isPending } = useEditUrl()
+
   const [openQRModal, setOpenQRModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
-  const [messageApi, contextHolder] = message.useMessage()
-  const date = new Date(createdAt).toLocaleDateString()
 
-  const handleCopyLink = async () => {
-    await navigator.clipboard.writeText(`${URL_API}/${shortCode}`)
+  const shortUrl = `${URL_API}/${shortCode}`
+
+  const handleCopyLink = useCallback(async () => {
+    await navigator.clipboard.writeText(shortUrl)
     messageApi.open({
       type: 'success',
-      content: `${URL_API}/${shortCode} copiado al portapapeles`
+      content: `${shortUrl} copiado al portapapeles`
     })
-  }
+  }, [shortUrl, messageApi])
 
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false)
-    refreshURLs()
-  }
+  const handleEditURL = useCallback(
+    async ({ urlValue, description }) => {
+      try {
+        await mutateAsync({ id, url: urlValue, newDescription: description })
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setOpenEditModal(false)
+      }
+    },
+    [id, mutateAsync]
+  )
 
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false)
-    refreshURLs()
-  }
+  const actions = useMemo(
+    () => [
+      <QrcodeOutlined key="qrcode" onClick={() => setOpenQRModal(true)} />,
+      <CopyOutlined key="copy" onClick={handleCopyLink} />,
+      <EditOutlined key="edit" onClick={() => setOpenEditModal(true)} />,
+      <DeleteOutlined key="delete" onClick={() => setOpenDeleteModal(true)} />
+    ],
+    [handleCopyLink]
+  )
 
-  const actions = [
-    <QrcodeOutlined key="qrcode" onClick={() => setOpenQRModal(true)} />,
-    <CopyOutlined key="copy" onClick={handleCopyLink} />,
-    <EditOutlined key="edit" onClick={() => setOpenEditModal(true)} />,
-    <DeleteOutlined key="delete" onClick={() => setOpenDeleteModal(true)} />
-  ]
+  const handleClickCard = useCallback(() => {
+    window.open(shortUrl, '_blank', 'noopener,noreferrer')
+  }, [shortUrl])
 
   return (
     <Card
@@ -62,20 +81,23 @@ const URLCard = ({
       actions={actions}
       style={{ minWidth: 350, maxWidth: 350, maxHeight: loading && 146 }}
       title={'/' + shortCode}
-      extra={<a href="#">More</a>}
+      extra={<ClicksBadge clicks={clicks} />}
+      hoverable
     >
       <Card.Meta
         avatar={<Avatar src={icon} />}
-        title={originalUrl}
+        title={
+          <Tooltip title={originalUrl}>
+            <span className="truncate block">{originalUrl}</span>
+          </Tooltip>
+        }
+        onClick={handleClickCard}
         description={
-          <>
-            <p>{`${URL_API}/${shortCode}`}</p>
-
-            <div className="flex flex-row justify-between mt-2">
-              <p className="truncate mr-3">{description}</p>
-              <p>{date}</p>
-            </div>
-          </>
+          <URLCardDescription
+            shortUrl={shortUrl}
+            description={description}
+            date={date}
+          />
         }
       />
       <QRCodeModal
@@ -86,16 +108,19 @@ const URLCard = ({
       />
       <DeleteModal
         open={openDeleteModal}
-        handleClose={handleCloseDeleteModal}
+        handleClose={() => setOpenDeleteModal(false)}
         id={id}
       />
-      <EditModal
+      <URLModalForm
         open={openEditModal}
-        handleClose={handleCloseEditModal}
+        title="Editar URL"
+        handleCancel={() => setOpenEditModal(false)}
         originalUrl={originalUrl}
         shortCode={shortCode}
         description={description}
-        id={id}
+        handleFetch={handleEditURL}
+        isEdit
+        isPending={isPending}
       />
       {contextHolder}
     </Card>

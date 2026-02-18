@@ -1,51 +1,42 @@
-import { useAppStore } from "@/zustand";
-import { message } from "antd";
-import { Input, Modal, Form, Button } from "antd";
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import { login, register } from "@/services/authService";
-import { useMutation } from "@tanstack/react-query";
+import { Input, Modal, Form, Button } from 'antd'
+import { useState } from 'react'
+import { useLogin, useRegister } from '@/services/authService'
 
-const LoginRegisterModal = ({ open, handleCancel }) => {
-  const navigate = useNavigate();
-  const [registerMode, setRegisterMode] = useState(false);
+const LoginRegisterModal = ({
+  open,
+  handleCancel,
+  handleOk,
+  isRegister = false
+}) => {
+  const [registerMode, setRegisterMode] = useState(isRegister)
   const [data, setData] = useState({
-    email: "",
-    password: "",
-    username: "",
-  });
+    email: '',
+    password: '',
+    username: ''
+  })
 
-  const setUser = useAppStore((s) => s.setUser);
-
-  const [messageApi, contextHolder] = message.useMessage();
-
-  const URL = import.meta.env.VITE_API_URL;
-  const { Password } = Input;
-
-  const { mutate: handleAuth, isLoading } = useMutation({
-    mutationFn: () =>
-      registerMode ? register(data) : login(data.email, data.password),
-    onSuccess: (res) => {
-      if (registerMode) {
-        setRegisterMode(false);
-        messageApi.success("Registrado");
-      } else {
-        setUser(res);
-        navigate("/dashboard");
-        messageApi.success("Conectado");
-      }
-      handleCancel();
-    },
-    onError: (err) => messageApi.error(err.message),
-  });
+  const { mutateAsync: register, isPending: registerPending } = useRegister()
+  const { mutateAsync: login, isPending: loginPending } = useLogin()
+  const { Password } = Input
 
   const toggleRegisterMode = () => {
-    setRegisterMode((prev) => !prev);
-  };
+    setRegisterMode((prev) => !prev)
+  }
 
   const handleLoginRegister = async () => {
-    handleAuth();
-  };
+    try {
+      if (registerMode) {
+        await register(data)
+        setRegisterMode(false)
+      } else {
+        const { email, password } = data
+        await login({ email, password })
+      }
+      handleOk?.()
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
     <Modal
@@ -55,22 +46,21 @@ const LoginRegisterModal = ({ open, handleCancel }) => {
       onOk={handleLoginRegister}
       onCancel={handleCancel}
       destroyOnHidden
-      okButtonProps={{ text: "Crear" }}
+      okButtonProps={{ text: 'Crear' }}
       footer={[
         <Button key="cancel" onClick={toggleRegisterMode}>
-          {registerMode ? "Iniciar Sesión" : "Registrarse"}
+          {registerMode ? 'Iniciar Sesión' : 'Registrarse'}
         </Button>,
         <Button
           key="ok"
           type="primary"
           onClick={handleLoginRegister}
-          loading={isLoading}
+          loading={registerPending || loginPending}
         >
-          {!registerMode ? "Iniciar Sesión" : "Registrarse"}
-        </Button>,
+          {!registerMode ? 'Iniciar Sesión' : 'Registrarse'}
+        </Button>
       ]}
     >
-      {contextHolder}
       <div>
         <Form layout="vertical">
           {registerMode && (
@@ -80,6 +70,7 @@ const LoginRegisterModal = ({ open, handleCancel }) => {
                 onChange={(e) =>
                   setData((prev) => ({ ...prev, username: e.target.value }))
                 }
+                autoComplete="username"
               />
             </Form.Item>
           )}
@@ -98,12 +89,13 @@ const LoginRegisterModal = ({ open, handleCancel }) => {
                 setData((prev) => ({ ...prev, password: e.target.value }))
               }
               onPressEnter={handleLoginRegister}
+              autoComplete={registerMode ? 'new-password' : 'current-password'}
             />
           </Form.Item>
         </Form>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default LoginRegisterModal;
+export default LoginRegisterModal

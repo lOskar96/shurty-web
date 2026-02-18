@@ -1,69 +1,77 @@
-import { useAppStore } from "../zustand";
-const URL = import.meta.env.VITE_API_URL;
+import { useAppStore } from '../zustand'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import fetchData from './fetchData'
 
-export async function register(username, email, password) {
-  const res = await fetch(`${URL}/auth/register`, {
-    method: "POST",
-    body: JSON.stringify({ username, email, password }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error("Credenciales inválidas");
+export const useRegister = () => {
+  const setUser = useAppStore((s) => s.setUser)
 
-  const data = await res.json();
-
-  useAppStore.getState().setUser({
-    username: data.username,
-    email: data.email,
-  });
-
-  return data;
+  return useMutation({
+    mutationFn: ({ username, email, password }) =>
+      fetchData({
+        url: '/api/auth/register',
+        options: {
+          method: 'POST',
+          body: { username, email, password }
+        }
+      }),
+    onSuccess: (data) => {
+      setUser(data)
+    }
+  })
 }
 
-export async function login(email, password) {
-  const res = await fetch(`${URL}/auth/login`, {
-    method: "POST",
-    credentials: "include", // cookies!
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+export const useLogin = () => {
+  const queryClient = useQueryClient()
+  const setUser = useAppStore((s) => s.setUser)
 
-  if (!res.ok) throw new Error("Credenciales inválidas");
-
-  const data = await res.json();
-
-  useAppStore.getState().setUser({
-    username: data.username,
-    email: data.email,
-  });
-
-  return data;
+  return useMutation({
+    mutationFn: ({ email, password }) =>
+      fetchData({
+        url: '/api/auth/login',
+        options: {
+          method: 'POST',
+          body: { email, password }
+        }
+      }),
+    onSuccess: (data) => {
+      setUser(data)
+      queryClient.invalidateQueries()
+    }
+  })
 }
 
-export async function logout() {
-  await fetch(`${URL}/auth/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
+export const useLogout = () => {
+  const queryClient = useQueryClient()
+  const logout = useAppStore((s) => s.logout)
 
-  useAppStore.getState().setUser(null);
+  return useMutation({
+    mutationFn: () =>
+      fetchData({
+        url: '/api/auth/logout',
+        options: {
+          method: 'POST'
+        }
+      }),
+    onSuccess: () => {
+      logout()
+      queryClient.clear()
+    }
+  })
 }
 
-export async function refreshUser() {
-  const res = await fetch(`${URL}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-  });
+export const useRefreshUser = () => {
+  const setUser = useAppStore((s) => s.setUser)
 
-  if (!res.ok) throw new Error("No autenticado");
-
-  const data = await res.json();
-
-  useAppStore.getState().setUser({
-    username: data.username,
-    email: data.email,
-  });
-
-  return data;
+  return useMutation({
+    mutationFn: () =>
+      fetchData({
+        url: '/api/auth/refresh',
+        options: {
+          method: 'POST'
+        }
+      }),
+    onSuccess: (data) => {
+      setUser(data)
+    }
+  })
 }

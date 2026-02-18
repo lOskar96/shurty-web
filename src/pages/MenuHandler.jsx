@@ -1,8 +1,5 @@
-import useApiFetch from '@/hooks/useApiFetch'
-import { useAppStore } from '@/zustand'
 import { LinkOutlined, SettingOutlined } from '@ant-design/icons'
 import { Menu } from 'antd'
-import { useEffect } from 'react'
 import { useState } from 'react'
 import Settings from './Settings'
 import Links from './Links'
@@ -22,8 +19,6 @@ const items = [
 
 const MenuHandler = () => {
   const [current, setCurrent] = useState('links')
-  const { fetchData } = useApiFetch()
-  const setUrls = useAppStore((s) => s.setUrls)
 
   const handleMenuClick = (e) => {
     setCurrent(e.key)
@@ -36,18 +31,6 @@ const MenuHandler = () => {
       return <Settings />
     }
   }
-
-  useEffect(() => {
-    const fetchUrls = async () => {
-      const response = await fetchData({
-        url: '/',
-        options: { method: 'GET' }
-      })
-      setUrls(response)
-    }
-
-    fetchUrls()
-  }, [fetchData, setUrls])
 
   return (
     <div className="flex flex-col">

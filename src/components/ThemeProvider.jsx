@@ -8,15 +8,12 @@ export default function ThemeProvider({ children }) {
   useEffect(() => {
     const root = document.documentElement
 
-    // Añadir clase de transición
     root.classList.add('theme-transition')
 
-    // Quitar después de 300ms (duración de la transición CSS)
     const timeout = setTimeout(() => {
       root.classList.remove('theme-transition')
     }, 350)
 
-    // Aplicar tema tailwind
     root.classList.remove('light', 'dark')
     root.classList.add(activeTheme)
 

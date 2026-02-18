@@ -12,6 +12,12 @@ const Header = () => {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const user = useAppStore((s) => s.user)
+
+  const handleOk = () => {
+    navigate('/dashboard')
+    setOpen(false)
+  }
+
   return (
     <header className="flex justify-between items-center w-full h-16 border-b-2 border-transparent max-sm:pl-2 max-sm:pr-2 sm:pl-4 sm:pr-4 backdrop-blur-sm backdrop-brightness-100 sticky top-0 z-50">
       <img
@@ -33,7 +39,7 @@ const Header = () => {
       </div>
       <LoginRegisterModal
         open={open}
-        handleOk={() => setOpen(false)}
+        handleOk={handleOk}
         handleCancel={() => setOpen(false)}
       />
     </header>

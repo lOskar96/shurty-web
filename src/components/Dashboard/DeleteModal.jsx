@@ -1,14 +1,12 @@
 import { Modal } from 'antd'
 import Text from '../Text'
 import { WarningFilled } from '@ant-design/icons'
-import useApiFetch from '@/hooks/useApiFetch'
+import { useDeleteUrl } from '@/services/urlService'
+
 const DeleteModal = ({ open, handleClose, id }) => {
-  const { fetchData } = useApiFetch()
+  const { mutateAsync } = useDeleteUrl()
   const handleDeleteURL = async () => {
-    await fetchData({
-      url: `/removeURL/${id}`,
-      options: { method: 'DELETE' }
-    })
+    await mutateAsync({ id })
     handleClose()
   }
   return (

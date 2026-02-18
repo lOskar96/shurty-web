@@ -19,11 +19,8 @@
 
 :root.dark {
   background-color: #020617;
-  background-image: linear-gradient(
-      to right,
-      rgba(71, 85, 105, 0.15) 1px,
-      transparent 1px
-    ),
+  background-image:
+    linear-gradient(to right, rgba(71, 85, 105, 0.15) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(71, 85, 105, 0.15) 1px, transparent 1px),
     radial-gradient(
       circle at 50% 60%,
@@ -31,16 +28,16 @@
       rgba(168, 85, 247, 0.05) 40%,
       transparent 70%
     );
-  background-size: 40px 40px, 40px 40px, 100% 100%;
+  background-size:
+    40px 40px,
+    40px 40px,
+    100% 100%;
 }
 
 :root.light {
   background-color: #f5f7fa;
-  background-image: linear-gradient(
-      to right,
-      rgba(100, 116, 139, 0.12) 1px,
-      transparent 1px
-    ),
+  background-image:
+    linear-gradient(to right, rgba(100, 116, 139, 0.12) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(100, 116, 139, 0.12) 1px, transparent 1px),
     radial-gradient(
       circle at 50% 60%,
@@ -49,7 +46,10 @@
       transparent 70%
     );
 
-  background-size: 40px 40px, 40px 40px, 100% 100%;
+  background-size:
+    40px 40px,
+    40px 40px,
+    100% 100%;
 }
 
 #root {
@@ -57,12 +57,18 @@
 }
 
 .theme-transition * {
-  transition: background-color 0.35s ease, border-color 0.35s ease,
-    color 0.35s ease, fill 0.35s ease, stroke 0.35s ease !important;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease !important;
 }
 
 html {
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 a {
@@ -77,7 +83,9 @@ a:hover {
 body {
   min-width: 100dvw;
   min-height: 100dvh;
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 h1 {
@@ -115,4 +123,34 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeDown {
+  animation: fadeDown 0.5s ease-out forwards;
+}
+
+.animate-fadeUp {
+  animation: fadeUp 0.5s ease-out forwards;
 }

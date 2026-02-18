@@ -7,34 +7,34 @@ import {
 } from '@ant-design/icons'
 import { useAppStore } from '@/zustand'
 import { useNavigate } from 'react-router'
-import useApiFetch from '@/hooks/useApiFetch'
+import { useLogout } from '@/services/authService'
+
+const items = [
+  {
+    key: 'home',
+    label: 'Home',
+    icon: <HomeOutlined />
+  },
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    icon: <DashboardOutlined />
+  },
+  {
+    key: 'profile',
+    label: 'Mi perfil',
+    icon: <UserOutlined />
+  },
+  {
+    key: 'logout',
+    label: 'Cerrar sesión',
+    icon: <LogoutOutlined />
+  }
+]
 
 const UserAvatar = () => {
-  const { logout, user } = useAppStore()
-  const { fetchData } = useApiFetch()
-
-  const items = [
-    {
-      key: 'home',
-      label: 'Home',
-      icon: <HomeOutlined />
-    },
-    {
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: <DashboardOutlined />
-    },
-    {
-      key: 'profile',
-      label: 'Mi perfil',
-      icon: <UserOutlined />
-    },
-    {
-      key: 'logout',
-      label: 'Cerrar sesión',
-      icon: <LogoutOutlined />
-    }
-  ]
+  const { user } = useAppStore()
+  const { mutate } = useLogout()
 
   const navigate = useNavigate()
 
@@ -44,11 +44,7 @@ const UserAvatar = () => {
     } else if (key === 'dashboard') {
       navigate('/dashboard')
     } else if (key === 'logout') {
-      logout()
-      fetchData({
-        url: '/auth/logout',
-        options: { method: 'POST' }
-      })
+      mutate()
       navigate('/')
     }
   }
