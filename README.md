@@ -1,18 +1,144 @@
-# React + Vite
+# 🔗 Shurty – URL Shortener Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Shurty is a modern URL shortener web application built with **React**.
+It allows users to create, manage, and track shortened URLs with a clean and responsive UI.
 
-Currently, two official plugins are available:
+This project was built as a portfolio-ready application with production-oriented architecture and best practices.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Live Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- 🔗 Create shortened URLs
+- ✏️ Edit existing URLs
+- 🗑 Delete URLs
+- 📊 Track click counts
+- 📱 Generate QR codes
+- 🔐 Authentication required for persistence
+- ⚡ Optimistic UX with loading states
+- 🎯 Clean modal-based flows
+- 🧠 Global state management
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## 🏗 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React (Vite)**
+- **TypeScript**
+- **Ant Design**
+- **React Query (@tanstack/react-query)**
+- **Zustand**
+- **React Router**
+- REST API backend (Node.js + Express)
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+ ├── components/
+ ├── pages/
+ ├── services/        # API logic (React Query)
+ ├── zustand/         # Global state
+ ├── hooks/
+ └── utils/
+```
+
+Architecture is separated by responsibility:
+
+- UI components
+- Server state (React Query)
+- Client state (Zustand)
+- Routing
+- Services layer abstraction
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the root:
+
+```
+VITE_API_URL=https://shurty.up.railway.app
+```
+
+---
+
+## 🛠 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/lOskar96/url-shortener-react.git
+
+# Enter the project
+cd url-shortener-react
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+---
+
+## 🔄 Authentication Flow
+
+1. User attempts to create a shortened URL.
+2. If not authenticated → login/register modal opens.
+3. After successful authentication → URL creation resumes automatically.
+4. User is redirected to dashboard.
+
+This flow ensures smooth UX without losing user intent.
+
+---
+
+## 📊 State Management Strategy
+
+- **React Query** → server state (API calls, caching, mutations)
+- **Zustand** → authentication & client-side global state
+- Local component state → UI interactions (modals, forms)
+
+---
+
+## 🎯 Key Architectural Decisions
+
+- Mutation logic isolated in service hooks (`useCreateUrl`, `useEditUrl`)
+- Modals are controlled components
+- Avoided unnecessary re-renders using `useCallback` & memoization
+- Declarative form validation with Ant Design
+- Clean separation between UI and data layer
+
+---
+
+## 🧪 Potential Improvements
+
+- Unit tests with Vitest
+- E2E tests with Playwright
+- Rate limiting feedback UI
+- Analytics dashboard
+- Public link preview
+- Custom domain support
+
+---
+
+## 📎 Backend Repository
+
+The backend for this project can be found here:
+
+👉 https://github.com/lOskar96/url-shortener-node
+
+---
+
+## 👨‍💻 Author
+
+**Oscar Marmol Calle**
+
+Frontend-focused developer building production-ready SaaS applications.
+
+---
+
+## 📄 License
+
+This project is for educational and portfolio purposes.
