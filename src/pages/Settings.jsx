@@ -14,6 +14,7 @@ import { Modal } from 'antd'
 import { useUrls } from '@/services/urlService'
 import { useDeleteUser } from '@/services/userService'
 import { useChangeUsername } from '@/services/userService'
+import { useEffect } from 'react'
 
 const items = [
   {
@@ -32,6 +33,7 @@ const Settings = () => {
   const { data: urls } = useUrls()
   const [username, setUsername] = useState(user?.username)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [form] = Form.useForm()
 
   const { mutate: changeUsername, isPending: isPendingChangeUsername } =
     useChangeUsername()
@@ -96,6 +98,10 @@ const Settings = () => {
     setOpenDeleteModal(false)
   }
 
+  useEffect(() => {
+    console.log(username)
+  }, [username])
+
   return (
     <div className="max-sm:pl-2 max-sm:pr-2 sm:pl-42 sm:pr-42">
       <div
@@ -104,7 +110,7 @@ const Settings = () => {
         }`}
       >
         <Text value="Cuenta" className="mb-4" />
-        <Form layout="vertical">
+        <Form form={form} layout="vertical">
           <Form.Item label="Usuario">
             <div className="flex">
               <Input

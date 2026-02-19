@@ -8,7 +8,6 @@ import LoginRegisterModal from '@/components/Header/LoginRegisterModal'
 import { useCreateUrl } from '@/services/urlService'
 import { useNavigate } from 'react-router'
 import { useAppStore } from '@/zustand'
-import { useEffect } from 'react'
 import { useCallback } from 'react'
 
 const Home = () => {
@@ -22,7 +21,6 @@ const Home = () => {
   const isAuthenticated = useAppStore((s) => s.isAuthenticated)
 
   const handleEnterInput = () => {
-    console.log('entra')
     setOpenURLModal(true)
   }
 
@@ -63,10 +61,6 @@ const Home = () => {
     },
     [mutateAsync, navigate]
   )
-
-  useEffect(() => {
-    console.log(openURLModal)
-  }, [openURLModal])
 
   return (
     <div className="flex flex-col items-center justify-center h-[calc(100vh-230px)] text-center">

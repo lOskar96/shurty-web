@@ -1,8 +1,8 @@
 import { LinkOutlined, SettingOutlined } from '@ant-design/icons'
 import { Menu } from 'antd'
-import { useState } from 'react'
 import Settings from './Settings'
 import Links from './Links'
+import { useAppStore } from '@/zustand'
 
 const items = [
   {
@@ -18,16 +18,17 @@ const items = [
 ]
 
 const MenuHandler = () => {
-  const [current, setCurrent] = useState('links')
+  const nav = useAppStore((s) => s.nav)
+  const setNav = useAppStore((s) => s.setNav)
 
   const handleMenuClick = (e) => {
-    setCurrent(e.key)
+    setNav(e.key)
   }
 
   const renderItem = () => {
-    if (current === 'links') {
+    if (nav === 'links') {
       return <Links />
-    } else if (current === 'settings') {
+    } else if (nav === 'settings') {
       return <Settings />
     }
   }
@@ -39,7 +40,7 @@ const MenuHandler = () => {
           className="bg-transparent backdrop-blur-sm backdrop-brightness-100"
           style={{ backgroundColor: 'transparent' }}
           onClick={handleMenuClick}
-          selectedKeys={[current]}
+          selectedKeys={[nav]}
           mode="horizontal"
           items={items}
         />

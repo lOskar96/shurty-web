@@ -3,10 +3,11 @@ import {
   UserOutlined,
   LogoutOutlined,
   HomeOutlined,
-  DashboardOutlined
+  DashboardOutlined,
+  SettingOutlined
 } from '@ant-design/icons'
 import { useAppStore } from '@/zustand'
-import { useNavigate } from 'react-router'
+import { useNavigate, useLocation } from 'react-router'
 import { useLogout } from '@/services/authService'
 
 const items = [
@@ -21,9 +22,9 @@ const items = [
     icon: <DashboardOutlined />
   },
   {
-    key: 'profile',
-    label: 'Mi perfil',
-    icon: <UserOutlined />
+    key: 'settings',
+    label: 'Ajustes',
+    icon: <SettingOutlined />
   },
   {
     key: 'logout',
@@ -33,16 +34,22 @@ const items = [
 ]
 
 const UserAvatar = () => {
-  const { user } = useAppStore()
+  const user = useAppStore((s) => s.user)
+  const setNav = useAppStore((s) => s.setNav)
   const { mutate } = useLogout()
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleClick = ({ key }) => {
     if (key === 'home') {
       navigate('/')
     } else if (key === 'dashboard') {
+      setNav('links')
       navigate('/dashboard')
+    } else if (key === 'settings') {
+      setNav('settings')
+      location.pathname === '/' && navigate('/dashboard')
     } else if (key === 'logout') {
       mutate()
       navigate('/')
@@ -53,7 +60,7 @@ const UserAvatar = () => {
     <Dropdown menu={{ items, onClick: handleClick }} trigger={['click']}>
       <Avatar
         size={48}
-        src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user.username}`}
+        src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${user?.username}`}
         style={{
           cursor: 'pointer',
           transition: 'transform .15s ease'

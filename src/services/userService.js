@@ -14,7 +14,6 @@ export const useChangeUsername = () => {
         }
       }),
     onSuccess: ({ user }) => {
-      console.log(user)
       setUser(user)
     }
   })
