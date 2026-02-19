@@ -14,7 +14,6 @@ import { Modal } from 'antd'
 import { useUrls } from '@/services/urlService'
 import { useDeleteUser } from '@/services/userService'
 import { useChangeUsername } from '@/services/userService'
-import { useEffect } from 'react'
 
 const items = [
   {
@@ -97,10 +96,6 @@ const Settings = () => {
     await deleteUser({ id: user.id })
     setOpenDeleteModal(false)
   }
-
-  useEffect(() => {
-    console.log(username)
-  }, [username])
 
   return (
     <div className="max-sm:pl-2 max-sm:pr-2 sm:pl-42 sm:pr-42">
